@@ -1,0 +1,18 @@
+---
+// One archive card — same markup the original Elementor Posts widget emits, so the
+// vendored grid CSS styles it identically.
+interface Props { url: string; title: string; thumb?: string; }
+const { url, title, thumb } = Astro.props;
+---
+<article class="elementor-post elementor-grid-item post type-post status-publish has-post-thumbnail hentry">
+  <div class="elementor-post__card">
+    {thumb && (
+      <a class="elementor-post__thumbnail__link" href={url}>
+        <div class="elementor-post__thumbnail"><img src={thumb} alt="" loading="lazy" /></div>
+      </a>
+    )}
+    <div class="elementor-post__text">
+      <h3 class="elementor-post__title"><a href={url}>{title}</a></h3>
+    </div>
+  </div>
+</article>

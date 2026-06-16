@@ -1,0 +1,45 @@
+---
+// Reproduces the original Elementor single-post template (id 1712), injecting the
+// article's series label, title, and Markdown-rendered body at the 3 carved points.
+import BaseLayout from './BaseLayout.astro';
+import shellRaw from '../mirror/article.shell.html?raw';
+import articleHeadRaw from '../mirror/article.head.html?raw';
+import bodyClassRaw from '../mirror/article.bodyclass.txt?raw';
+
+interface Props {
+  title: string;
+  seriesLabel?: string;
+  wpId?: number;
+  description?: string;
+  ogImage?: string;
+}
+const { title, seriesLabel = '現実科学レクチャーシリーズ', wpId = 0, description, ogImage } = Astro.props;
+
+// The captured template is scoped to the source post id (4981). Re-scope to this
+// post so the per-post CSS/classes match (all posts share template 1712).
+const idSwap = (s: string) => (wpId ? s.replaceAll('4981', String(wpId)) : s);
+
+const shell = idSwap(shellRaw);
+const [before, afterSeries] = shell.split('<!--RS_SERIES-->');
+const [betweenSeriesTitle, afterTitle] = afterSeries.split('<!--RS_TITLE-->');
+const [betweenTitleContent, afterContent] = afterTitle.split('<!--RS_CONTENT-->');
+
+const headExtra = idSwap(articleHeadRaw);
+const bodyClass = idSwap(bodyClassRaw.trim());
+---
+<BaseLayout
+  title={`${title} - 現実科学ラボ`}
+  description={description}
+  bodyClass={bodyClass}
+  headerVariant="inner"
+  headExtra={headExtra}
+  ogImage={ogImage}
+>
+  <Fragment set:html={before} />
+  <Fragment set:html={seriesLabel} />
+  <Fragment set:html={betweenSeriesTitle} />
+  {title}
+  <Fragment set:html={betweenTitleContent} />
+  <slot />
+  <Fragment set:html={afterContent} />
+</BaseLayout>

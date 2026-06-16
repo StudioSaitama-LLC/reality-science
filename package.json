@@ -1,0 +1,25 @@
+{
+  "name": "reality-science",
+  "type": "module",
+  "version": "0.1.0",
+  "private": true,
+  "description": "現実科学ラボ (reality-science.com) — 静的サイト + Markdown 記事システム",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check",
+    "migrate:posts": "node scripts/migrate-posts.mjs",
+    "fetch:media": "node scripts/fetch-media.mjs",
+    "mirror:chrome": "node scripts/mirror-chrome.mjs",
+    "new": "node scripts/new-article.mjs"
+  },
+  "dependencies": {
+    "astro": "^5.13.0"
+  },
+  "devDependencies": {
+    "sharp": "^0.34.1",
+    "turndown": "^7.2.0",
+    "turndown-plugin-gfm": "^1.0.2"
+  }
+}

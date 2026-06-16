@@ -1,0 +1,9 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import body from '../mirror/about.body.html?raw';
+import headExtra from '../mirror/about.head.html?raw';
+import bodyClass from '../mirror/about.bodyclass.txt?raw';
+---
+<BaseLayout title="ABOUT - 現実科学ラボ" bodyClass={bodyClass.trim()} headerVariant="inner" headExtra={headExtra}>
+  <Fragment set:html={body} />
+</BaseLayout>

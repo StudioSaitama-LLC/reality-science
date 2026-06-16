@@ -1,0 +1,16 @@
+# build output
+dist/
+.astro/
+
+# deps
+node_modules/
+
+# WordPress dump (build-time input only — DO NOT COMMIT, 2.77GB archive / 116MB sql)
+_dump/
+
+# scratch / crawl caches
+.cache/
+*.log
+
+# os
+.DS_Store

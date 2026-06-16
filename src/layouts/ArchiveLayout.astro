@@ -1,0 +1,23 @@
+---
+// Category archive (LECTURE / NEWS / WORKSHOP / PR). Reuses the original Elementor
+// archive template carved from /event/, injecting the title and collection cards.
+import BaseLayout from './BaseLayout.astro';
+import PostCard from '../components/PostCard.astro';
+import shell from '../mirror/archive.shell.html?raw';
+import headExtra from '../mirror/event.head.html?raw';
+import bodyClassRaw from '../mirror/event.bodyclass.txt?raw';
+import type { CardItem } from '../lib/posts';
+
+interface Props { title: string; archiveTitle: string; entries: CardItem[]; }
+const { title, archiveTitle, entries } = Astro.props;
+
+const [before, rest] = shell.split('<!--RS_TITLE-->');
+const [between, after] = rest.split('<!--RS_CARDS-->');
+---
+<BaseLayout title={title} bodyClass={bodyClassRaw.trim()} headerVariant="inner" headExtra={headExtra}>
+  <Fragment set:html={before} />
+  {archiveTitle}
+  <Fragment set:html={between} />
+  {entries.map((e) => <PostCard url={e.url} title={e.title} thumb={e.thumb} />)}
+  <Fragment set:html={after} />
+</BaseLayout>

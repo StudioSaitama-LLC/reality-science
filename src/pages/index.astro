@@ -1,0 +1,14 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import body from '../mirror/home.body.html?raw';
+import headExtra from '../mirror/home.head.html?raw';
+import bodyClass from '../mirror/home.bodyclass.txt?raw';
+---
+<BaseLayout
+  title="現実科学ラボ - 科学技術を実装し、より豊かな『現実』を発見するためのギルド"
+  bodyClass={bodyClass.trim()}
+  headerVariant="home"
+  headExtra={headExtra}
+>
+  <Fragment set:html={body} />
+</BaseLayout>

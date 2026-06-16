@@ -1,0 +1,6 @@
+---
+import ArchiveLayout from '../../layouts/ArchiveLayout.astro';
+import { getArticlesInCategory } from '../../lib/posts';
+const entries = await getArticlesInCategory('event');
+---
+<ArchiveLayout title="LECTURE - 現実科学ラボ" archiveTitle="LECTURES" entries={entries} />

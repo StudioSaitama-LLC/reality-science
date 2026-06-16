@@ -1,0 +1,9 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import body from '../mirror/join.body.html?raw';
+import headExtra from '../mirror/join.head.html?raw';
+import bodyClass from '../mirror/join.bodyclass.txt?raw';
+---
+<BaseLayout title="JOIN｜ラボへの参加・協賛 - 現実科学ラボ" bodyClass={bodyClass.trim()} headerVariant="inner" headExtra={headExtra}>
+  <Fragment set:html={body} />
+</BaseLayout>
