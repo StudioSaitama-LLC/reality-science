@@ -25,7 +25,10 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci
-      - run: npm run build
+      # Project-page (github.io/reality-science/) build: root-absolute paths get the
+      # /reality-science base prefix. For custom-domain cutover at root, switch this
+      # to `npm run build` and add public/CNAME.
+      - run: npm run build:pages
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
