@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
-    "build:pages": "astro build && node scripts/rebase.mjs reality-science",
+    "build:pages": "SITE_ORIGIN=https://studiosaitama-llc.github.io BASE_PATH=/reality-science astro build && node scripts/rebase.mjs reality-science",
     "preview": "astro preview",
     "check": "astro check",
     "migrate:posts": "node scripts/migrate-posts.mjs",

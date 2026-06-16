@@ -26,7 +26,16 @@ const {
 } = Astro.props;
 
 const header = headerVariant === 'home' ? headerHome : headerInner;
-const canonical = new URL(Astro.url.pathname, Astro.site).href;
+
+// Canonical / OG must reflect the actual deployment, not the old production WP site.
+// build:pages sets these to the staging origin+base; default build uses the
+// production domain at root (for the eventual custom-domain cutover).
+const SITE_ORIGIN = process.env.SITE_ORIGIN || 'https://reality-science.com';
+const BASE_PATH = process.env.BASE_PATH || '';
+const canonical = `${SITE_ORIGIN}${BASE_PATH}${Astro.url.pathname}`;
+const ogImageUrl = ogImage
+  ? (ogImage.startsWith('http') ? ogImage : `${SITE_ORIGIN}${BASE_PATH}${ogImage}`)
+  : undefined;
 ---
 <!DOCTYPE html>
 <html lang="ja">
@@ -41,7 +50,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site).href;
     <meta property="og:type" content="website" />
     <meta property="og:url" content={canonical} />
     <meta property="og:locale" content="ja_JP" />
-    {ogImage && <meta property="og:image" content={new URL(ogImage, Astro.site).href} />}
+    {ogImageUrl && <meta property="og:image" content={ogImageUrl} />}
     <meta name="twitter:card" content="summary_large_image" />
     <Fragment set:html={headLinks} />
     {headExtra && <Fragment set:html={headExtra} />}
@@ -51,5 +60,22 @@ const canonical = new URL(Astro.url.pathname, Astro.site).href;
     <slot />
     <Fragment set:html={footerHtml} />
     <Fragment set:html={scriptsHtml} />
+    <script is:inline>
+      // Mobile hamburger toggle — Elementor's own JS isn't reliably bootstrapped on
+      // the static mirror, so drive the menu directly (matches Elementor's behavior).
+      document.addEventListener('click', function (e) {
+        var t = e.target.closest && e.target.closest('.elementor-menu-toggle');
+        if (!t) return;
+        var on = t.classList.toggle('elementor-active');
+        t.setAttribute('aria-expanded', on ? 'true' : 'false');
+        var icon = t.querySelector('i');
+        if (icon) icon.className = on ? 'eicon-close' : 'eicon-menu-bar';
+        var dd = t.parentElement && t.parentElement.querySelector('.elementor-nav-menu--dropdown');
+        if (dd) {
+          dd.setAttribute('aria-hidden', on ? 'false' : 'true');
+          dd.style.display = on ? 'block' : 'none';
+        }
+      });
+    </script>
   </body>
 </html>
