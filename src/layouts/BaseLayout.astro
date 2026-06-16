@@ -76,6 +76,23 @@ const ogImageUrl = ogImage
           dd.style.display = on ? 'block' : 'none';
         }
       });
+
+      // Video-playlist widgets build their player via Elementor Pro JS (not
+      // bootstrapped on the static mirror), leaving the player area empty. Inject
+      // the first PV video as a responsive iframe so the box isn't blank.
+      document.querySelectorAll('.elementor-widget-video-playlist').forEach(function (w) {
+        var cw = w.querySelector('.e-tabs-content-wrapper');
+        if (!cw || cw.querySelector('iframe')) return;
+        var s;
+        try { s = JSON.parse((w.getAttribute('data-settings') || '').replace(/&quot;/g, '"')); } catch (e) { return; }
+        var url = (s && s.tabs && s.tabs[0] && s.tabs[0].youtube_url) || '';
+        var m = url.match(/(?:v=|youtu\.be\/|embed\/)([\w-]{11})/);
+        if (!m) return;
+        cw.innerHTML =
+          '<div style="position:relative;width:100%;padding-bottom:56.25%;height:0;overflow:hidden;">' +
+          '<iframe src="https://www.youtube.com/embed/' + m[1] + '?rel=0" ' +
+          'style="position:absolute;inset:0;width:100%;height:100%;border:0;" allowfullscreen loading="lazy"></iframe></div>';
+      });
     </script>
   </body>
 </html>
