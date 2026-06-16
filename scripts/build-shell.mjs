@@ -117,6 +117,10 @@ function pageBody(html) {
     if (block) body = body.replace(block, '');
   }
   body = body.replace(/<script\b[\s\S]*?<\/script>/gi, '');
+  // Elementor adds `elementor-has-item-ratio` to posts containers via JS; without
+  // it the thumbnail ratio-box / cover image breaks (blank space under the image).
+  // Add it statically so home/archive loop cards render correctly.
+  body = body.replace(/elementor-posts-container elementor-posts/g, 'elementor-posts-container elementor-has-item-ratio elementor-posts');
   return clean(body).trim();
 }
 for (const [name, html] of [['home', home], ['about', about], ['join', read('join')], ['contact', read('contact')], ['event', read('event')]]) {
@@ -153,12 +157,7 @@ fs.writeFileSync(path.join(OUT, 'article.bodyclass.txt'), bodyClass(article));
 // 6) ARCHIVE template (shared by every category archive; carved from /event/).
 //    Templatize the page title and the cards-grid contents; drop pagination.
 {
-  let arch = pageBody(read('event'));
-  // Elementor adds `elementor-has-item-ratio` to the posts container via JS at
-  // runtime; that class is what makes the thumbnail a fixed-ratio cover box (the
-  // img becomes position:absolute). The static mirror has no JS, so add it here —
-  // otherwise images sit at natural size with blank space below.
-  arch = arch.replace('elementor-posts-container elementor-posts', 'elementor-posts-container elementor-has-item-ratio elementor-posts');
+  let arch = pageBody(read('event')); // pageBody already injects elementor-has-item-ratio
   const pcIdx = arch.indexOf('elementor-posts-container');
   const open = arch.lastIndexOf('<div', pcIdx);
   const [, end] = extractBalancedDiv(arch, open);

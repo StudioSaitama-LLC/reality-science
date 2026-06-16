@@ -1,0 +1,95 @@
+/* 記事本文の可読性向上（UI/UX）。Elementor 単一投稿テンプレの本文枠に適用。
+   タイトル・シリーズ見出し等のテンプレ部分には影響させない。 */
+.elementor-widget-theme-post-content > .elementor-widget-container {
+  max-width: 780px;
+  margin-inline: auto;
+  font-size: 1.0625rem; /* ~17px */
+  line-height: 1.95;
+  color: #333;
+  letter-spacing: 0.01em;
+  word-break: break-word;
+}
+
+.elementor-widget-theme-post-content p {
+  margin: 0 0 1.6em;
+}
+
+.elementor-widget-theme-post-content h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.5;
+  margin: 2.6em 0 1em;
+  padding-bottom: 0.4em;
+  border-bottom: 2px solid #ececec;
+}
+.elementor-widget-theme-post-content h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  line-height: 1.5;
+  margin: 2.2em 0 0.8em;
+}
+.elementor-widget-theme-post-content h4 {
+  font-size: 1.08rem;
+  font-weight: 700;
+  margin: 1.8em 0 0.6em;
+}
+
+.elementor-widget-theme-post-content ul,
+.elementor-widget-theme-post-content ol {
+  margin: 0 0 1.6em;
+  padding-left: 1.6em;
+}
+.elementor-widget-theme-post-content li {
+  margin: 0.5em 0;
+  line-height: 1.85;
+}
+
+.elementor-widget-theme-post-content a {
+  color: #1a4f8b;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.elementor-widget-theme-post-content a:hover {
+  color: #11365f;
+}
+.elementor-widget-theme-post-content strong {
+  font-weight: 700;
+}
+
+/* 画像（バナー等）— 中央寄せ・角丸・前後の余白 */
+.elementor-widget-theme-post-content img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 1.8em auto;
+  border-radius: 6px;
+}
+.elementor-widget-theme-post-content a img {
+  margin: 0 auto;
+}
+.elementor-widget-theme-post-content figure {
+  margin: 1.8em 0;
+}
+.elementor-widget-theme-post-content figcaption {
+  font-size: 0.85em;
+  color: #888;
+  text-align: center;
+  margin-top: 0.6em;
+}
+
+.elementor-widget-theme-post-content blockquote {
+  margin: 1.8em 0;
+  padding: 0.4em 1.2em;
+  border-left: 4px solid #d8d8d8;
+  color: #555;
+}
+.elementor-widget-theme-post-content iframe {
+  max-width: 100%;
+  display: block;
+  margin: 1.8em auto;
+}
+.elementor-widget-theme-post-content hr {
+  border: 0;
+  border-top: 1px solid #e5e5e5;
+  margin: 2.4em 0;
+}
