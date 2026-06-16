@@ -13,6 +13,7 @@ export function rewriteContentUrls(html) {
   out = out.replace(/https?:\/\/reality-science\.com\/wp-content\/uploads\//g, '/wp-content/uploads/');
   // internal page links: strip the domain so they resolve on the static site
   out = out.replace(/https?:\/\/reality-science\.com\//g, '/');
+  out = out.replace(/https?:\/\/reality-science\.com\b/g, '/'); // bare domain (no trailing slash)
   // tidy any leftover /wp/ doubled paths
   out = out.replace(/\/wp\/wp-content\//g, '/wp-content/');
   return out;

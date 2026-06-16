@@ -22,6 +22,7 @@ function clean(html) {
   s = s.replace(/\/wp\/wp-content\//g, '/wp-content/');
   s = s.replace(/\/wp\/wp-includes\//g, '/wp-includes/');
   s = s.replace(/https?:\/\/reality-science\.com\//g, '/');
+  s = s.replace(/https?:\/\/reality-science\.com\b/g, '/'); // bare domain (logo/home link)
   return s;
 }
 
