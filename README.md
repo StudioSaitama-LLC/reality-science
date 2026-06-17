@@ -41,15 +41,15 @@ npm run preview    # ビルド結果をプレビュー
 
 ## 記事を追加する（CMS 不要フロー）
 
-→ [docs/adding-articles.md](docs/adding-articles.md)
+正本の手順 → [docs/adding-articles.md](docs/adding-articles.md)。Claude Code 利用時はリポジトリ同梱スキル **`/add-article`** が同じ手順を案内する。
 
 ざっくり:
 1. `node scripts/new-article.mjs vol-74 "Vol.74 …（2026/8/25開催）" event,news`
 2. 画像を `public/wp-content/uploads/YYYY/MM/` に置き、本文 `.md` を書く
 3. frontmatter の `draft: true` を外す
-4. commit & push → GitHub Actions が自動ビルド・デプロイ
+4. ブランチを切って commit → PR（main マージで GitHub Actions が自動ビルド・デプロイ）
 
-permalink は `date` と `slug` から `/YYYY/MM/slug/` を自動生成（旧 WordPress と同一構造）。
+permalink は `date` と `slug` から `/YYYY/MM/slug/` を自動生成（旧 WordPress と同一構造）。記事を1本足すと **HOME の NEWS / NEXT LECTURE / LECTURE グリッドも自動更新**される。
 
 ## 移行スクリプト（再実行可能・通常は不要）
 
@@ -75,4 +75,5 @@ permalink は `date` と `slug` から `/YYYY/MM/slug/` を自動生成（旧 Wo
 ## 未対応 / TODO
 
 - **CONTACT フォーム**: 旧 Contact Form 7 はサーバ処理が必要なため静的では送信不可。バックエンド（Cloudflare Worker / Formspree / mailto 等）を確定して差し替える。
-- **HOME の NEWS / NEXT LECTURE**: 現状は移行時点のスナップショット。記事追加で自動更新したい場合は collection 駆動に置き換える（アーカイブ `/event/` `/news/` は既に collection 駆動）。
+
+> HOME の NEWS / NEXT LECTURE / LECTURE グリッドは記事コレクション駆動で**自動更新済み**（アーカイブ `/event/` `/news/` 同様、記事 `.md` を足すだけで反映。`src/pages/index.astro`）。

@@ -1,8 +1,128 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import body from '../mirror/home.body.html?raw';
+import rawBody from '../mirror/home.body.html?raw';
 import headExtra from '../mirror/home.head.html?raw';
 import bodyClass from '../mirror/home.bodyclass.txt?raw';
+import { getArticlesByPublishDate, getArticlesInCategory, type CardItem } from '../lib/posts';
+
+// HOME の3つの「投稿リスト」はコレクション駆動。記事 .md を1枚足すだけで
+// NEWS / NEXT LECTURE / LECTURE SERIES グリッドが自動更新される（移行時の静的
+// スナップショットを置き換え）。外枠の Elementor markup は home.body.html を
+// そのまま使い、この3領域だけビルド時に差し替える。
+const news = (await getArticlesByPublishDate()).slice(0, 4); // 新着4件（公開日順・全カテゴリ）
+const lectures = await getArticlesInCategory('event'); // event=レクチャー、開催日降順（Vol 順）
+const grid = lectures.slice(0, 3); // LECTURE SERIES グリッド3件
+// NEXT LECTURE = これから開催される最も近いレクチャー。無ければ最新を出す。
+// （event が空なら next は undefined → nextBanner は空文字を返し、バナー無しで描画される。仕様）
+const now = new Date();
+const todayUTC = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
+const upcoming = lectures.filter((l) => l.sortKey >= todayUTC).sort((a, b) => a.sortKey - b.sortKey);
+const next: CardItem | undefined = upcoming[0] ?? lectures[0];
+
+// テキスト・属性値の両方に使う最小エスケープ（& < > " ）。タイトルだけでなく
+// href/src/slug にも適用して、frontmatter 由来の & や " で markup が壊れないようにする。
+const esc = (s: string) =>
+  s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+const ymd = (d: Date) =>
+  `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}-${String(d.getUTCDate()).padStart(2, '0')}`;
+const slugOf = (url: string) => esc(url.split('/').filter(Boolean).pop() ?? '');
+const catCls = (cats: string[]) => cats.map((c) => `category-${esc(c)}`).join(' ');
+
+// --- NEWS 1件（日付 + タイトル行）。元の post-4981 ループ markup を再現 ---
+// 元は日付を /YYYY/MM/DD/ の日付アーカイブへリンクしていたが、この静的サイトに
+// 日付アーカイブは無いため意図的にリンクを外し <span> のみにする（404 回避・見た目同一）。
+const NEWS_STYLE =
+  '<style id="elementor-post-978">.elementor-978 .elementor-element.elementor-element-3a6f56e4 .elementor-icon-list-icon{width:14px;}.elementor-978 .elementor-element.elementor-element-3a6f56e4 .elementor-icon-list-icon i{font-size:14px;}.elementor-978 .elementor-element.elementor-element-3a6f56e4 .elementor-icon-list-icon svg{--e-icon-list-icon-size:14px;}.elementor-978 .elementor-element.elementor-element-3a6f56e4 > .elementor-widget-container{margin:0px 16px 0px 0px;}.elementor-978 .elementor-element.elementor-element-3a6f56e4{width:initial;max-width:initial;}.elementor-978 .elementor-element.elementor-element-115bb31a > .elementor-widget-container{margin:7px 0px 0px 0px;}.elementor-978 .elementor-element.elementor-element-115bb31a{width:initial;max-width:initial;}</style>';
+const newsItem = (it: CardItem) => {
+  const s = slugOf(it.url);
+  const c = catCls(it.categories);
+  return `<article id="post-${s}" class="elementor-post elementor-grid-item ecs-post-loop post-${s} post type-post status-publish format-standard has-post-thumbnail hentry ${c}">
+<div data-elementor-type="loop" data-elementor-id="978" class="elementor elementor-978 elementor-location-single post-${s} post type-post status-publish format-standard has-post-thumbnail hentry ${c}" data-elementor-settings="[]">
+<div class="elementor-section-wrap">
+<section class="elementor-section elementor-top-section elementor-element elementor-element-39d4d691 elementor-section-boxed elementor-section-height-default elementor-section-height-default" data-id="39d4d691" data-element_type="section">
+<div class="elementor-container elementor-column-gap-default">
+<div class="elementor-column elementor-col-100 elementor-top-column elementor-element elementor-element-51ff6216" data-id="51ff6216" data-element_type="column">
+<div class="elementor-widget-wrap elementor-element-populated">
+<div class="elementor-element elementor-element-3a6f56e4 elementor-widget__width-initial elementor-widget elementor-widget-post-info" data-id="3a6f56e4" data-element_type="widget" data-widget_type="post-info.default">
+<div class="elementor-widget-container">
+<ul class="elementor-icon-list-items elementor-post-info">
+<li class="elementor-icon-list-item elementor-repeater-item-f15c625" itemprop="datePublished">
+<span class="elementor-icon-list-text elementor-post-info__item elementor-post-info__item--type-date">${ymd(it.date)}</span>
+</li>
+</ul>
+</div>
+</div>
+<div class="elementor-element elementor-element-115bb31a elementor-widget__width-initial elementor-widget elementor-widget-theme-post-title elementor-page-title elementor-widget-heading" data-id="115bb31a" data-element_type="widget" data-widget_type="theme-post-title.default">
+<div class="elementor-widget-container">
+<p class="elementor-heading-title elementor-size-default"><a href="${esc(it.url)}">${esc(it.title)}</a></p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+</div>
+</article>`;
+};
+
+// --- NEXT LECTURE バナー（image widget 内の anchor+img を再現） ---
+// 元は target="_blank"（別タブ）だったが、内部リンクのため同タブ遷移にする（意図的）。
+// srcset は新規記事に -300x147/-768x376 派生が無いため付けず、featured_image 原寸のみ。
+const nextBanner = (it?: CardItem) =>
+  it && it.thumb
+    ? `<a href="${esc(it.url)}"><img width="920" height="450" src="${esc(it.thumb)}" class="attachment-full size-full" alt="${esc(it.title)}" loading="lazy" /></a>`
+    : '';
+
+// --- LECTURE SERIES グリッドのカード（サムネのみ）。新着記事には -300x147 派生が
+//     無いので featured_image 原寸を使う（CSS が枠に収める） ---
+const gridCard = (it: CardItem) => {
+  const s = slugOf(it.url);
+  const c = catCls(it.categories);
+  return `<article class="elementor-post elementor-grid-item post-${s} post type-post status-publish format-standard has-post-thumbnail hentry ${c}">
+<a class="elementor-post__thumbnail__link" href="${esc(it.url)}">
+<div class="elementor-post__thumbnail"><img width="300" height="147" src="${esc(it.thumb ?? '')}" class="attachment-medium size-medium" alt="${esc(it.title)}" loading="lazy" /></div>
+</a>
+<div class="elementor-post__text">
+</div>
+</article>`;
+};
+
+// ⚠️ 差し替えの目印（anchor）は、コミット済みの home.body.html スナップショットに含まれる
+// 具体的な投稿（post-4981 / vol-70・71・72）に結びついている。記事 .md を足すだけでは
+// mirror は変わらないので普段は安全だが、`npm run mirror:chrome` で mirror を撮り直すと
+// これらの anchor が一致しなくなり build が落ちる。その際はこの3つの anchor を
+// 新しいスナップショットに合わせて更新すること（落ちる＝黙って古い静的内容を出さない設計）。
+function splice(html: string, start: string, endAnchorFrom: string, replacement: string, label: string): string {
+  const i = html.indexOf(start);
+  if (i < 0) throw new Error(`home splice[${label}]: start anchor not found（mirror 再取得後は anchor 更新が必要）`);
+  const a = html.indexOf(endAnchorFrom, i);
+  if (a < 0) throw new Error(`home splice[${label}]: end anchor not found（mirror 再取得後は anchor 更新が必要）`);
+  const j = html.indexOf('</article>', a);
+  if (j < 0) throw new Error(`home splice[${label}]: closing </article> not found`);
+  return html.slice(0, i) + replacement + html.slice(j + '</article>'.length);
+}
+
+let body = rawBody;
+// NEWS: post-4981 から vol-70 記事の閉じまで → 新着4件
+body = splice(body, '<article id="post-4981"', '/2026/02/vol-70/', NEWS_STYLE + news.map(newsItem).join('\n'), 'news');
+// LECTURE グリッド: grid の vol-73 カードから vol-71 カードの閉じまで → 最新3件
+body = splice(
+  body,
+  '<article class="elementor-post elementor-grid-item post-4981 post type-post',
+  '/2026/03/vol-71/',
+  grid.map(gridCard).join('\n'),
+  'grid'
+);
+// NEXT LECTURE: image widget の anchor だけ差し替え（</article> ではなく </a> 終端）
+{
+  const start = '<a href="/2026/03/vol-72" target="_blank">';
+  const i = body.indexOf(start);
+  if (i < 0) throw new Error('home splice[next]: start anchor not found（mirror 再取得後は anchor 更新が必要）');
+  const j = body.indexOf('</a>', i);
+  if (j < 0) throw new Error('home splice[next]: </a> not found');
+  body = body.slice(0, i) + nextBanner(next) + body.slice(j + '</a>'.length);
+}
 ---
 <BaseLayout
   title="現実科学ラボ - 科学技術を実装し、より豊かな『現実』を発見するためのギルド"

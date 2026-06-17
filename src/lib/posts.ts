@@ -43,3 +43,11 @@ export async function getArticles(): Promise<CardItem[]> {
 export async function getArticlesInCategory(slug: string): Promise<CardItem[]> {
   return (await getArticles()).filter((e) => e.categories.includes(slug));
 }
+
+// HOME の NEWS など「公開日の新しい順」が欲しい用途向け。getArticles() の sortKey は
+// lecture の開催日（Vol 順）なので、ニュース系を混ぜると新着順がずれる。ここでは公開日
+// (date) 降順で並べ、同じ公開日のタイだけ sortKey（lecture は開催日）降順で割って
+// Vol 順を保つ（移行元の Vol.71/72 のように公開日が同日のケースの取り違えを防ぐ）。
+export async function getArticlesByPublishDate(): Promise<CardItem[]> {
+  return (await getArticles()).sort((a, b) => b.date.getTime() - a.date.getTime() || b.sortKey - a.sortKey);
+}
