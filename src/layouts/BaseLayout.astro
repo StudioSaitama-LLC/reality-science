@@ -87,6 +87,42 @@ const ogImageUrl = ogImage
       })();
     </script>
     <script is:inline>
+      // Sticky scroll-header — the home has a second nav section that is
+      // position:fixed (Elementor "sticky on scroll"). Its JS normally keeps it
+      // hidden at the top and fades it in once you scroll down; without that JS it
+      // sits permanently over the main overlay header. Reproduce: hide fixed
+      // top-sections at the very top, reveal after scrolling.
+      (function () {
+        function stickies() {
+          var all = document.querySelectorAll('.elementor-top-section');
+          var out = [];
+          for (var i = 0; i < all.length; i++) {
+            if (getComputedStyle(all[i]).position === 'fixed') out.push(all[i]);
+          }
+          return out;
+        }
+        var list = stickies();
+        if (!list.length) return;
+        var armed = false; // enable the fade only after the initial (instant) hide
+        function update() {
+          var y = window.pageYOffset || document.documentElement.scrollTop || 0;
+          var show = y > 8;
+          for (var i = 0; i < list.length; i++) {
+            list[i].style.opacity = show ? '1' : '0';
+            list[i].style.pointerEvents = show ? 'auto' : 'none';
+          }
+        }
+        update(); // instant, no transition -> no load flash
+        requestAnimationFrame(function () {
+          if (armed) return;
+          armed = true;
+          for (var i = 0; i < list.length; i++) list[i].style.transition = 'opacity .25s ease';
+        });
+        window.addEventListener('scroll', update, { passive: true });
+        window.addEventListener('load', function () { list = stickies(); update(); });
+      })();
+    </script>
+    <script is:inline>
       // Mobile hamburger toggle — Elementor's own JS isn't reliably bootstrapped on
       // the static mirror, so drive the menu directly (matches Elementor's behavior).
       document.addEventListener('click', function (e) {
