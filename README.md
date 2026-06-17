@@ -2,6 +2,17 @@
 
 WordPress + Elementor で運用していた「現実科学ラボ」サイトを、**静的サイト + Markdown 記事システム**として再構築したもの。CMS 不要・Claude Code で `.md` を 1 枚追加するだけで記事が増え、GitHub Actions が GitHub Pages へ自動デプロイする。
 
+## 🧑‍🤝‍🧑 運用する人はここから
+
+| 目的 | ドキュメント |
+|---|---|
+| はじめての人（設置〜最初の一歩） | **[導入ガイド](docs/getting-started.md)** |
+| 運用全般（記事・写真・資材・公開確認・困ったとき） | **[運用マニュアル](docs/operations.md)** |
+| 記事を追加する詳細手順 | [記事の追加方法](docs/adding-articles.md) |
+| 技術的な決まり（開発・Claude Code 向け） | [CLAUDE.md](CLAUDE.md) |
+
+以降は技術構成の説明（運用だけなら上記の3ドキュメントで足ります）。
+
 ## 技術スタック
 
 | 領域 | 採用 |
